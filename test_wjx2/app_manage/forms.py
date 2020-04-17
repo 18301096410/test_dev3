@@ -23,3 +23,14 @@ class ProjectEditForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ["name","describe","status"]
+
+
+
+#模块的表单,ModelForm属于一个表单
+class ModuleForm(forms.ModelForm):
+    class Meta:
+        model = Module
+        fields = ["project","name","describe"]
+
+
+

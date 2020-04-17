@@ -6,10 +6,13 @@ from django.http import HttpResponseRedirect
 
 # Create your views here.
 @login_required
-def manage(request):
+def list_project(request):
     '''项目管理'''
+    #把用户名返回给这个界面
+    username = request.COOKIES.get('user','')
     projects_list = Project.objects.all
-    return render(request, "project_list.html", {"projects":projects_list})
+    return render(request, "project/project_list.html", {"projects":projects_list,
+                                                         "user":username})
 
 def add_project(request):
     #判断请求方法是否是post
@@ -26,41 +29,27 @@ def add_project(request):
             #进行创建数据
             Project.objects.create(name=name,describe=describe,status=status)
         #创建完成之后跳转到项目界面
-        return HttpResponseRedirect("/project/")
+        return HttpResponseRedirect("/manage/")
     else:
         #如果是空的话跳转到project_add界面
         form = ProjectForm()
         #把表单作为一个对象传给到前端
-    return render(request, "project_add.html", {"form":form})
+    return render(request, "project/project_add.html", {"form":form})
 
 #编辑项目，这个pid就是连接中的id
 def edit_project(request,pid):
-    # if request.method == "POST":
-    #     #更新
-    #     form = ProjectForm(request.POST)
-    #     if form.is_valid():     #判断里面的值
-    #         name = form.cleaned_data['name']    # 名称
-    #         describe = form.cleaned_data['describe']    # 描述
-    #         status = form.cleaned_data['status']    # 状态
-    #         p = Project.objects.get(id=pid)
-    #         p.name = name   #将下面每一个字段的值进行赋值
-    #         p.describe = describe
-    #         p.status = status
-    #         p.save()    #进行保存
-    #     return HttpResponseRedirect("/manage/")     #保存之后的跳转，回到项目列表当中
     if request.method == "POST":
         form = ProjectForm(request.POST)
-        if form.is_valid():
+        if form.is_valid():#判断里面的值
             name = form.cleaned_data['name']
             describe = form.cleaned_data['describe']
             status = form.cleaned_data['status']
-
             p = Project.objects.get(id=pid)
-            p.name = name
+            p.name = name   #将下面每一个字段的值进行赋值
             p.describe = describe
             p.status = status
-            p.save()
-        return HttpResponseRedirect("/manage/")
+            p.save()    #进行保存
+        return HttpResponseRedirect("/manage/")     #保存之后的跳转，回到项目列表当中
     else:
         if pid:
             #先进行查询数据给到表单
@@ -70,7 +59,7 @@ def edit_project(request,pid):
             #否则就是没有pid，form就是返回一个不带数据的表格
             form = ProjectForm()
             #否则就把它返回
-        return render(request,"project_edit.html",{
+        return render(request, "project/project_edit.html", {
             "form":form,
             "id":pid
         })
@@ -80,9 +69,9 @@ def delete_project(request,pid):
     if request.method == "GET":
         p = Project.objects.get(id=pid)
         p.delete()
-        return HttpResponseRedirect("/project/")
+        return HttpResponseRedirect("/manage/")
     else:
-        return HttpResponseRedirect("/project/")
+        return HttpResponseRedirect("/manage/")
 
 
 

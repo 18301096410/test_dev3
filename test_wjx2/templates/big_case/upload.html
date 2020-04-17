@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--    <div class="container-fluid">-->
+<!--        <div class="row">-->
+<!--            <form enctype="multipart/form-data" action="/upload_file/" method="POST">-->
+<!--                <input type="file" name="myfile"/>-->
+<!--                <br/>-->
+<!--                <input type="submit" value="upload"/>-->
+<!--            </form>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <form th:action="@{/upload}" enctype="multipart/form-data" th:method="post">-->
+<!--		上传文件：<input type="file" name = "file">-->
+<!--		<input type="submit" value="提交">-->
+<!--	    </form>-->
+	<form th:action="@{/upload}" enctype="multipart/form-data" th:method="post">
+		上传文件：<input type="file" name = "file2">
+		<input type="submit" value="提交">
+	    </form>
+	<a th:href="@{/download}">下载文件</a>
+
+
+	</form>
+</body>
+</html>

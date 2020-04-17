@@ -34,7 +34,7 @@ def login(request):
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             auth.login(request, user)  # 记录用户的登录状态
-            response = HttpResponseRedirect("/project/")
+            response = HttpResponseRedirect("/manage/")
             response.set_cookie("user", username, 3600)
             return response
         else:
