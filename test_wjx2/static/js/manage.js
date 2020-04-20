@@ -2,11 +2,14 @@
 function SelectInit(defaultProjectId, defaultModuleId) {
     // console.log("初始化Select下拉框");
     console.log("选中的项目", defaultProjectId);
-    console.log("选中的模块", defaultModuleId);
+    console.log("选中的模块123", defaultModuleId);
+    // console.log("选中的模块123", defaultModuleId);
+
     var cmbProject = document.getElementById("selectProject");
     var cmbModule = document.getElementById("selectModule");
 
     var dataList = [];
+
 
     //设置默认选项
     function setDefaultOption(obj, id) {
@@ -70,3 +73,4 @@ function SelectInit(defaultProjectId, defaultModuleId) {
 
     getSelectData();
 }
+

@@ -2,14 +2,15 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.http import FileResponse
 from django.template import RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse,StreamingHttpResponse
 from django.urls import reverse
 from django.utils.http import urlquote
+from django.conf import settings
 # Create your views here.
 
 from app_big_case.models import File
 from app_big_case.forms import UploadForm
-import os
+import os,shutil
 
 
 
@@ -42,23 +43,44 @@ def list(request):
 
 
 
-
+#上传文件
 def upload(request):
     if request.method == "POST":       #请求方法为post时，进行处理
+        print(123456)
         myFile = request.FILES.get("myfile",None)   #如果文件上传为空，则默认显示为None
         if not myFile:
             return HttpResponse("没有文件可以上传")
-        destination = open(os.path.join("",myFile,"wb+"))   #打开文件特定文件的二进制写操作
+        # shutil.copy(str(myFile),'/Users/wangsijia/Desktop/Test')
+        destination = open(os.path.join("/Users/wangsijia/Desktop/file/file_list",myFile.name),'wb+')   #打开文件特定文件的二进制写操作
+        print(destination)
+        # # print(type(myFile))
+        print(myFile.chunks())
         for chunk in myFile.chunks():   #分块写入文件
+            print('----------------------')
+            # print(chunk)
             destination.write(chunk)
             destination.close()
         return HttpResponse("上传成功")
+
     else:
         file_list = []
         files = "/Users/wangsijia/Desktop/file/file_list"
         for i in file_list:
             file_list.append(i)
-        return render(request,"upload_html",{'file_list':file_list})
+        return render(request,"big_case/upload.html",{'file_list':file_list})
+
+#下载文件
+def download(request):
+    filename = request.Get.get('file')
+    filepath = os.path.join(settings.MEDIA_ROOT,filename)
+    fp = open(filepath, 'rb')
+    response = StreamingHttpResponse(fp)
+    # response = FileResponse(fp)
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="%s"' % filename
+    return response
+    fp.close()
+
 
 
 

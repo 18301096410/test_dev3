@@ -133,38 +133,47 @@
 <script src="https://cdn.bootcss.com/jquery-jsonview/1.2.3/jquery.jsonview.js"></script>
 <link href="https://cdn.bootcss.com/jsoneditor/5.32.5/jsoneditor.css" rel="stylesheet">
 <script src="https://cdn.bootcss.com/jsoneditor/5.32.5/jsoneditor.js"></script>
-<script src="/static/js/manage.js"></script>
+{#<script src="/static/js/manage.js"></script>#}
+<script src="/static/js/jx-test-manage.js"></script>
 <script type="text/javascript">
     
     //初始化
-    SelectInit();
+    {#SelectInit();#}
+    SelectInit2();
 
     //初始化JSONeditor编辑框
     var headers = document.getElementById("headerEditor");
+    {#这个编辑器是从上面的包中引入过来的#}
     var parameters = document.getElementById("parameterEditor");
     var options = {
         mode: "code"
     };
+    //传递header数值
     var headerEditor = new JSONEditor(headers, options);
     var parameterEditor = new JSONEditor(parameters, options);
 
     function sendFun() {
+        {#取出url里面的数值#}
         req_url = $('#req_url').val();
+        {#获取方法，看是get还是post#}
         req_method = $('input[name="req_method"]:checked').val();
         // req_header = $('#header').val();
+        //参数类型
         req_type = $('input[name="par_type"]:checked').val();
 
-        req_header = headerEditor.get(); 
+        req_header = headerEditor.get();
+        //通过对象去get，去取它的参数值
         req_parameter = parameterEditor.get(); 
         let req_header_str = JSON.stringify(req_header, null, 2);
         let req_parameter_str = JSON.stringify(req_parameter, null, 2);
-        console.log("req_par", req_parameter_str);  
+        console.log("req_par", req_parameter_str);
 
         if (req_url == ""){
             window.alert("URL地址不能为空");
             return;
         }
 
+        //给后端传输数据
         $.get("/case/send_req/", {
             url: req_url,
             method: req_method,
@@ -172,6 +181,8 @@
             per_type: req_type,
             per_value: req_parameter_str, 
         },
+
+            {#写入到返回结果#}
         function (resp) {
             console.log("resp", resp);
             if(resp.code == 10200) {
@@ -186,6 +197,7 @@
 
     function assertFun() {
         var result_text = $('#result').val();
+        {#获取断言结果#}
         var assert_text = $('#assert').val();
         var assert_type = $('input[name="assert_type"]:checked').val();
 
@@ -193,6 +205,7 @@
             window.alert("断言的结果不能为空！");
         }
 
+        {#断言结果#}
         $.post("/case/assert_result/", { 
             result_text: result_text,
             assert_text: assert_text,
@@ -203,6 +216,7 @@
                 } else {
                     window.alert(resp.message);
                 }
+            {#console.log("resp",resp)#}
         });
     }
 
@@ -256,6 +270,7 @@
     
 </script>
 
+    //样式的编写
 <style>
     .option {
         height: 50px;

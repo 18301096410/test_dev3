@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path,include
 from app_person import views
 from app_manage.views import module_views
+from app_big_case import views as big_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,5 +43,6 @@ urlpatterns = [
 
     #上传下载文件接口
     path('big_case/',include('app_big_case.urls')),
+    path('big_case/upload/',big_views.upload),
 
 ]
