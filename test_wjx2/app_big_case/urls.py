@@ -9,5 +9,4 @@ urlpatterns = [
     path('',views.list),  # 列表
     path('upload/',views.upload),  # 上传
     path('download/<id>/',views.upload),
-
 ]

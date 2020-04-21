@@ -10,7 +10,10 @@ from django.conf import settings
 
 from app_big_case.models import File
 from app_big_case.forms import UploadForm
-import os,shutil
+
+from app_big_case.tools import upload_file
+
+import os,shutil,paramiko,datetime
 
 
 
@@ -46,21 +49,32 @@ def list(request):
 #上传文件
 def upload(request):
     if request.method == "POST":       #请求方法为post时，进行处理
-        print(123456)
+        #获取文件名称
         myFile = request.FILES.get("myfile",None)   #如果文件上传为空，则默认显示为None
+        print(myFile)
         if not myFile:
             return HttpResponse("没有文件可以上传")
-        # shutil.copy(str(myFile),'/Users/wangsijia/Desktop/Test')
-        destination = open(os.path.join("/Users/wangsijia/Desktop/file/file_list",myFile.name),'wb+')   #打开文件特定文件的二进制写操作
-        print(destination)
-        # # print(type(myFile))
-        print(myFile.chunks())
-        for chunk in myFile.chunks():   #分块写入文件
-            print('----------------------')
-            # print(chunk)
-            destination.write(chunk)
-            destination.close()
-        return HttpResponse("上传成功")
+        # 上传到本地文件夹
+        # destination = open(os.path.join("/Users/wangsijia/Desktop/file/file_list",myFile.name),'wb+')   #打开文件特定文件的二进制写操作
+        # print(destination)
+        # # # print(type(myFile))
+        # print(myFile.chunks())
+        # for chunk in myFile.chunks():   #分块写入文件
+        #     print('----------------------')
+        #     # print(chunk)
+        #     destination.write(chunk)
+        #     destination.close()
+        #上传文件到服务器
+        # print('文件明称是%s' % myFile.name)
+        # print('文件的类型是%s' % type(myFile.name))
+        local_file = r'/Users/wangsijia/Desktop/file/file_list/' + myFile.name
+        remote_path = os.path.join('/home/file/', myFile.name)
+        print(remote_path)
+        upload_file(local_file, remote_path)
+        # print(myFile)
+
+        # return HttpResponse("上传成功")
+        return render(request,"big_case/list.html")
 
     else:
         file_list = []

@@ -1,11 +1,36 @@
 from django.shortcuts import render
 from django.http import JsonResponse    #这个就是返回一个json格式的数据
-import requests,json
+from django.core.paginator import Paginator,PageNotAnInteger
+
 from app_manage.models import Project,Module
+from app_case.models import TestCase
+
+import requests,json
+
 # Create your views here.
 
 def list_case(request):
-    return render(request,"case/debug.html")
+    '''用例列表'''
+    cases = TestCase.objects.all()
+    #获取所有的数据，一页按照几条分
+    p = Paginator(cases,2)
+    #去获取这个页数信息
+    page = request.GET.get("page","")
+    if page == "":
+        page = 1
+    try:
+        #把这个页数给到前端
+        page_case = p.page(page)
+    except PageNotAnInteger:
+        #如果不是一个整型的时候，取第一页
+        page_case = p.page(1)
+    except:
+        #如果超出页数就给出最后一页的
+        page_case = p.page(p.num_pages)
+    #查出表中所有的数据，作为一个字段进行返回，这里面是分页之后的数据
+    return render(request,"case/list.html",{
+        "cases":page_case
+    })
 
 def send_req(request):
     if request.method == "GET":
@@ -99,34 +124,62 @@ def get_select_data(request):
             data_list.append(project_dict)              #获取项目之后添加到list当中
         return JsonResponse({"code":10200,"message":"success","data":data_list})
 
-# def get_select_data(request):
-#     """
-#     获取select下拉框需要项目/模块数据
-#     """
-#     if request.method == "GET":
-#         projects = Project.objects.all()
-#         data_list = []
-#         for p in projects:
-#             project_dict = {
-#                 "id": p.id,
-#                 "name": p.name
-#             }
-#             modules = Module.objects.filter(project=p)
-#             module_list = []
-#             for m in modules:
-#                 module_dict = {
-#                     "id": m.id,
-#                     "name": m.name
-#                 }
-#                 module_list.append(module_dict)
-#             project_dict["moduleList"] = module_list
-#             data_list.append(project_dict)
-#         return JsonResponse({"code": 10200, "message": "success", "data": data_list})
+
+def save_case(request):
+    '''保存用例'''
+    if request.method == "POST":
+        case_id = request.POST.get("cid", "")
+        url = request.POST.get("url", "")
+        method = request.POST.get("method", "")
+        header = request.POST.get("header", "")
+        per_type = request.POST.get("per_type", "")
+        per_value = request.POST.get("per_value", "")
+        result_text = request.POST.get("result_text", "")
+        variable = request.POST.get("variable", "")
+        assert_text = request.POST.get("assert_text", "")   #断言的文本
+        assert_type = request.POST.get("assert_type", "")   #断言的类型
+        module_id = request.POST.get("module_id", "")
+        case_name = request.POST.get("case_name", "")
+
+        if method == 'get':
+            method_int = 1
+        elif method == 'post':
+            method_int = 2
+        else:
+            return JsonResponse({"code": 10101, "message": "参数类型错误"})
+
+        if per_type == 'form':
+            per_type_int = 1
+        elif per_type == 'json':
+            per_type_int = 2
+        else:
+            return JsonResponse({"code": 10102, "message": "参数类型错误"})
+
+        if assert_type == "include":
+            assert_type_int = 1
+        elif assert_type == "equal":
+            assert_type_int = 2
+        else:
+            return JsonResponse({"code": 10103, "message": "参数类型错误"})
 
 
 
 
+        TestCase.objects.create(
+            # url=url,
+            module_id=module_id,
+            name=case_name,
+            method=method_int,
+            header=header,
+            parameter_type= per_type_int,
+            parameter_body=per_value,
+            result=result_text,
+            assert_text=assert_text,
+            assert_type=assert_type_int,
+        )
+        return JsonResponse({"code": 10200, "message": "create success"})
 
+#添加用例的时候返回debug
 
 
 def add_case(request):
